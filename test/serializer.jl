@@ -31,12 +31,7 @@ JSON.show_json(io::SC, ::NaNSerialization, f::AbstractFloat) = Base.print(io, f)
     [NaN, Inf, -Inf, 0.0];
     indent=4
 ) == """
-[
-    NaN,
-    Inf,
-    -Inf,
-    0.0
-]
+[NaN, Inf, -Inf, 0.0]
 """
 
 # issue #170: Print JavaScript functions directly

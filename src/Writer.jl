@@ -132,6 +132,7 @@ end
 
 # These aliases make defining additional methods on `show_json` easier.
 const CS = CommonSerialization
+const PC = PrettyContext
 const SC = StructuralContext
 
 # Low-level direct access
@@ -151,8 +152,12 @@ If appropriate, write a newline to the given context, then indent it by the
 appropriate number of spaces. Otherwise, do nothing.
 """
 @inline function indent(io::PrettyContext)
+	io.state < 0 && return
 	write(io, NEWLINE)
-	foreach(1:io.state) do _
+	foreach(1:io.state÷4) do _
+		write(io, TAB)
+	end
+	foreach(1:io.state%4) do _
 		write(io, SPACE)
 	end
 end
@@ -173,6 +178,14 @@ If this is not the first item written in a collection, write a comma in the
 structural context.  Otherwise, do not write a comma, but set a flag that the
 first element has been written already.
 """
+@inline function delimit(io::PrettyContext)
+	if !io.first
+		io.state < 0 ?
+		write(io, DELIMITER, SPACE) :
+		write(io, DELIMITER)
+	end
+	io.first = false
+end
 @inline function delimit(io::JSONContext)
 	if !io.first
 		write(io, DELIMITER)
@@ -293,6 +306,18 @@ function recursive_cycle_check(f, io::RecursiveCheckContext, s, id)
 	end
 end
 
+function show_json(io::PC, s::CS, x::Union{AbstractDict, NamedTuple})
+	recursive_cycle_check(io, s, objectid(x)) do
+		begin_object(io)
+		vs = values(x)
+		no_indent = length(vs) ≤ 8 && all(typeof.(vs) .<: Union{IsPrintedAsString, Real})
+		no_indent && (io.state = ~io.state; write(io, SPACE))
+		foreach(kv -> show_pair(io, s, kv), pairs(x))
+		no_indent && (io.state = ~io.state; write(io, SPACE))
+		no_indent && (io.first = true)
+		end_object(io)
+	end
+end
 function show_json(io::SC, s::CS, x::Union{AbstractDict, NamedTuple})
 	recursive_cycle_check(io, s, objectid(x)) do
 		begin_object(io)
@@ -317,6 +342,17 @@ function show_json(io::SC, s::CS, x::CompositeTypeWrapper)
 	end
 end
 
+function show_json(io::PC, s::CS, x::Union{AbstractVector, Tuple})
+	recursive_cycle_check(io, s, objectid(x)) do
+		begin_array(io)
+		no_indent = eltype(x) <: Union{IsPrintedAsString, Real}
+		no_indent && (io.state = ~io.state)
+		foreach(e -> show_element(io, s, e), x)
+		no_indent && (io.state = ~io.state)
+		no_indent && (io.first = true)
+		end_array(io)
+	end
+end
 function show_json(io::SC, s::CS, x::Union{AbstractVector, Tuple})
 	recursive_cycle_check(io, s, objectid(x)) do
 		begin_array(io)
