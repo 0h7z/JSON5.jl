@@ -1,7 +1,9 @@
-using JSON
+using JSON5
 using Test
 using Distributed: RemoteChannel
 using Sockets
+
+const JSON = JSON5
 
 @isdefined(a) || include("json-samples.jl")
 

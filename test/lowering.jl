@@ -1,9 +1,11 @@
 module TestLowering
 
-using JSON
+using JSON5
 using Test
 using Dates
 using FixedPointNumbers: Fixed
+
+const JSON = JSON5
 
 @test JSON.json(Date(2016, 8, 3)) == "\"2016-08-03\""
 

@@ -1,11 +1,13 @@
 module TestSerializer
 
-using JSON
+using JSON5
 using Test
 
 # to define a new serialization behaviour, import these first
-import JSON.Serializations: CommonSerialization, StandardSerialization
-import JSON: StructuralContext
+using JSON5.Serializations: CommonSerialization, StandardSerialization
+using JSON5: StructuralContext
+
+const JSON = JSON5
 
 # those names are long so we can define some type aliases
 const CS = CommonSerialization
