@@ -1,6 +1,4 @@
-VERSION < v"0.7.0-beta2.199" && __precompile__()
-
-module JSON
+module JSON5
 
 export json # returns a compact (or indented) JSON representation as a string
 export JSONText # string wrapper to insert raw JSON into JSON output
@@ -19,21 +17,22 @@ include("Writer.jl")
 # all of the following are part of the public interface in one way or another
 using .Parser: parse, parsefile
 using .Writer: show_json, json, lower, print, StructuralContext, show_element,
-               show_string, show_key, show_pair, show_null, begin_array,
-               end_array, begin_object, end_object, indent, delimit, separate,
-               JSONText
+	show_string, show_key, show_pair, show_null, begin_array,
+	end_array, begin_object, end_object, indent, delimit, separate,
+	JSONText
 using .Serializations: Serialization, CommonSerialization,
-                       StandardSerialization
+	StandardSerialization
 
 # for pretty-printed (non-compact) output, JSONText must be re-parsed:
 Writer.lower(json::JSONText) = parse(json.s)
 
 function _precompile_()
-    ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
-    x =  "{\"type\":\"callback\",\"data\":{\"callback\":1,\"result\":true,\"error\":false}}"
-    JSON.lower(JSON.parse(x))
+	ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
+	x = "{\"type\":\"callback\",\"data\":{\"callback\":1,\"result\":true,\"error\":false}}"
+	JSON5.lower(JSON5.parse(x))
 end
 
 _precompile_()
 
 end # module
+

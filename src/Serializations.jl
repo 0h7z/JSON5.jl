@@ -32,8 +32,9 @@ that is optimized to:
 
 All serializations defined for `CommonSerialization` are inherited by
 `StandardSerialization`. It is therefore generally advised to add new
-serialization behaviour to `CommonSerialization`.
+serialization behavior to `CommonSerialization`.
 """
 struct StandardSerialization <: CommonSerialization end
 
 end
+

@@ -2,45 +2,48 @@ name: CI
 on:
   pull_request:
     branches:
-      - master
+      - "master"
   push:
     branches:
-      - master
-    tags: '*'
+      - "master"
+    tags:
+      - "*"
+defaults:
+  run:
+    shell: bash
+env:
+  JULIA_NUM_THREADS: auto
 jobs:
   test:
-    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     strategy:
       fail-fast: false
       matrix:
-        version:
-          - '1.0'
-          - '1'
-          - 'nightly'
         os:
+          - windows-latest
           - ubuntu-latest
-        arch:
-          - x64
-        include:
-          - version: '1'
-            os: ubuntu-latest
-            arch: x86
-          - version: '1'
-            os: windows-latest
-            arch: x64
-          - version: '1'
-            os: macos-latest
-            arch: x64
+          - macos-latest
+        julia-version:
+          - "1.6"
+          - "1"
+          - "nightly"
+        exclude:
+          - os: macos-latest
+            julia-version: "1.6"
     steps:
       - uses: actions/checkout@v4
-      - uses: julia-actions/setup-julia@v1
         with:
-          version: ${{ matrix.version }}
-          arch: ${{ matrix.arch }}
+          persist-credentials: false
+      - uses: julia-actions/setup-julia@v2
+        with:
+          show-versioninfo: true
+          version: ${{ matrix.julia-version }}
       - uses: julia-actions/julia-buildpkg@v1
+        with:
+          ignore-no-cache: true
       - uses: julia-actions/julia-runtest@v1
-      - uses: julia-actions/julia-processcoverage@v1
-      - uses: codecov/codecov-action@v3
+      - uses: heptazhou/julia-codecov@v1
+      - uses: codecov/codecov-action@v3.1.5
         with:
           file: lcov.info
