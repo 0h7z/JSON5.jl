@@ -1,13 +1,11 @@
 module TestSerializer
 
-using JSON5
+using JSON5: JSON, JSONText, json
 using Test
 
-# to define a new serialization behaviour, import these first
+# to define a new serialization behavior, import these first
 using JSON5.Serializations: CommonSerialization, StandardSerialization
 using JSON5: StructuralContext
-
-const JSON = JSON5
 
 # those names are long so we can define some type aliases
 const CS = CommonSerialization

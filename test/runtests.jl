@@ -1,12 +1,10 @@
-using JSON5
+using JSON5: JSON, JSONText, json
 using Test
 using Dates
 using Distributed: RemoteChannel
 using OffsetArrays
 
 using DataStructures: DataStructures
-
-const JSON = JSON5
 
 include("json-samples.jl")
 

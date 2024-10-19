@@ -3,6 +3,8 @@ module JSON5
 export json # returns a compact (or indented) JSON representation as a string
 export JSONText # string wrapper to insert raw JSON into JSON output
 
+const JSON = JSON5
+
 include("Common.jl")
 
 # Parser modules
@@ -29,7 +31,7 @@ Writer.lower(json::JSONText) = parse(json.s)
 function _precompile_()
 	ccall(:jl_generating_output, Cint, ()) == 1 || return nothing
 	x = "{\"type\":\"callback\",\"data\":{\"callback\":1,\"result\":true,\"error\":false}}"
-	JSON5.lower(JSON5.parse(x))
+	JSON.lower(JSON.parse(x))
 end
 
 _precompile_()
