@@ -362,7 +362,7 @@ function number_from_bytes(pc::ParserContext,
 		int_from_bytes(pc, ps, bytes, from, to)
 	else
 		res = float_from_bytes(bytes, from, to)
-		res === nothing ? _error(E_BAD_NUMBER, ps) : res
+		isnothing(res) ? _error(E_BAD_NUMBER, ps) : res
 	end
 end
 
@@ -505,7 +505,7 @@ function parsefile(filename::AbstractString;
 	sz = filesize(filename)
 	open(filename) do io
 		s = use_mmap ? String(Mmap.mmap(io, Vector{UInt8}, sz)) : read(io, String)
-		parse(s; dicttype = dicttype, inttype = inttype, allownan = allownan, null = null)
+		parse(s; dicttype, inttype, allownan, null)
 	end
 end
 

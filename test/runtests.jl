@@ -35,8 +35,8 @@ include("json-samples.jl")
 
     @testset "Miscellaneous" begin
         # test for single values
-        @test JSON.parse("true") == true
-        @test JSON.parse("null") == nothing
+        @test JSON.parse("true") === true
+        @test JSON.parse("null") === nothing
         @test JSON.parse("\"hello\"") == "hello"
         @test JSON.parse("\"a\"") == "a"
         @test JSON.parse("1") == 1

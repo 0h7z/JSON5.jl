@@ -5,6 +5,7 @@ using ..Common
 using ..Serializations: Serialization, StandardSerialization,
 	CommonSerialization
 
+using Exts: Maybe
 using Unicode
 
 
@@ -106,7 +107,7 @@ mutable struct PrettyContext{T <: IO} <: RecursiveCheckContext
 	objectids::Set{UInt64}
 	recursive_cycle_token::Any
 end
-PrettyContext(io::IO, step, recursive_cycle_token = nothing) = PrettyContext(io, step, 0, false, Set{UInt64}(), recursive_cycle_token)
+PrettyContext(io::IO, step, recursive_cycle_token = nothing) = PrettyContext(io, abs(step), 0, false, Set{UInt64}(), recursive_cycle_token)
 
 """
 Internal implementation detail.
@@ -386,10 +387,10 @@ Serialize Julia object `obj` to IO `io` using the behavior described by `s`. If
 printed on one line. If pretty-printing is enabled, then a trailing newline will
 be printed; otherwise there will be no trailing newline.
 """
-function show_json(io::IO, s::Serialization, obj; indent = nothing)
-	ctx = indent === nothing ? CompactContext(io) : PrettyContext(io, indent)
+function show_json(io::IO, s::Serialization, obj; indent::Maybe{Int} = nothing)
+	ctx = isnothing(indent) ? CompactContext(io) : PrettyContext(io, indent)
 	show_json(ctx, s, obj)
-	if indent !== nothing
+	if !isnothing(indent)
 		println(io)
 	end
 end
@@ -410,16 +411,16 @@ end
 show_json(io::CompactContext, s::CS, json::JSONText) = write(io, json.s)
 # other contexts for JSONText are handled by lower(json) = parse(json.s)
 
-print(io::IO, obj, indent) =
-	show_json(io, StandardSerialization(), obj; indent = indent)
+print(io::IO, obj, indent::Maybe{Int}) =
+	show_json(io, StandardSerialization(), obj; indent)
 print(io::IO, obj) = show_json(io, StandardSerialization(), obj)
 
-print(a, indent) = print(stdout, a, indent)
+print(a, indent::Maybe{Int}) = print(stdout, a, indent)
 print(a) = print(stdout, a)
 
 """
 	json(a)
-	json(a, indent::Int)
+	json(a, indent::Maybe{Int})
 
 Creates a JSON string from a Julia object or value.
 
@@ -428,7 +429,7 @@ Arguments:
 * indent (optional): if provided, pretty-print array and object substructures by indenting with the provided number of spaces
 """
 json(a) = sprint(print, a)
-json(a, indent) = sprint(print, a, indent)
+json(a, indent::Maybe{Int}) = sprint(print, a, indent)
 
 end
 

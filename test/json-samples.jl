@@ -200,7 +200,7 @@ function validate_svg_tviewer_menu(str)
     @test j["menu"]["header"] == "SVG\tViewerα"
     @test isa(j["menu"]["items"], Vector{Any})
     @test length(j["menu"]["items"]) == 22
-    @test j["menu"]["items"][3] == nothing
+    @test j["menu"]["items"][3] === nothing
     @test j["menu"]["items"][2]["id"] == "OpenNew"
     @test j["menu"]["items"][2]["label"] == "Open New"
 end

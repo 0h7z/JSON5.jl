@@ -1,5 +1,5 @@
 function maxsize_buffer(maxsize::Int)
-	IOBuffer(maxsize = maxsize)
+	IOBuffer(; maxsize)
 end
 
 # Specialized functions for increased performance when JSON is in-memory

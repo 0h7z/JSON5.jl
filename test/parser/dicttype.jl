@@ -13,7 +13,7 @@ MissingDict() = DataStructures.DefaultDict{String,Any}(Missing)
 
     if T == MissingDict
         @test val isa DataStructures.DefaultDict{String}
-        @test val["y"] === missing
+        @test ismissing(val["y"])
     else
         @test val isa  T
         @test_throws KeyError val["y"]
