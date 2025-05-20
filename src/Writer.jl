@@ -104,10 +104,15 @@ mutable struct PrettyContext{T <: IO} <: RecursiveCheckContext
 	step::Int     # number of spaces to step
 	state::Int    # number of steps at present
 	first::Bool   # whether an object/array was just started
+	space::Bool
 	objectids::Set{UInt64}
 	recursive_cycle_token::Any
 end
-PrettyContext(io::IO, step, recursive_cycle_token = nothing) = PrettyContext(io, abs(step), 0, false, Set{UInt64}(), recursive_cycle_token)
+PrettyContext(io::IO, step, recursive_cycle_token = nothing) = begin
+	space = !(step < 0)
+	space || (step = ~step)
+	PrettyContext(io, step, 0, false, space, Set{UInt64}(), recursive_cycle_token)
+end
 
 """
 Internal implementation detail.
@@ -169,7 +174,7 @@ end
 
 Write a colon, followed by a space if appropriate, to the given context.
 """
-@inline separate(io::PrettyContext) = write(io, SEPARATOR, SPACE)
+@inline separate(io::PrettyContext) = !io.space ? write(io, SEPARATOR) : write(io, SEPARATOR, SPACE)
 @inline separate(io::CompactContext) = write(io, SEPARATOR)
 
 """
@@ -181,7 +186,7 @@ first element has been written already.
 """
 @inline function delimit(io::PrettyContext)
 	if !io.first
-		io.state < 0 ?
+		io.space && io.state < 0 ?
 		write(io, DELIMITER, SPACE) :
 		write(io, DELIMITER)
 	end
@@ -311,10 +316,10 @@ function show_json(io::PC, s::CS, x::Union{AbstractDict, NamedTuple})
 	recursive_cycle_check(io, s, objectid(x)) do
 		begin_object(io)
 		vs = values(x)
-		no_indent = length(vs) ≤ 8 && all(typeof.(vs) .<: Union{IsPrintedAsString, Real})
-		no_indent && (io.state = ~io.state; write(io, SPACE))
+		no_indent = !(io.state < 0) && (vs isa Tuple || length(vs) ≤ 8 && all(typeof.(vs) .<: Union{IsPrintedAsString, Real}))
+		no_indent && (io.state = ~io.state; io.space && write(io, SPACE))
 		foreach(kv -> show_pair(io, s, kv), pairs(x))
-		no_indent && (io.state = ~io.state; write(io, SPACE))
+		no_indent && (io.state = ~io.state; io.space && write(io, SPACE))
 		no_indent && (io.first = true)
 		end_object(io)
 	end
@@ -346,7 +351,7 @@ end
 function show_json(io::PC, s::CS, x::Union{AbstractVector, Tuple})
 	recursive_cycle_check(io, s, objectid(x)) do
 		begin_array(io)
-		no_indent = eltype(x) <: Union{IsPrintedAsString, Real}
+		no_indent = !(io.state < 0) && (x isa Tuple || eltype(x) <: Union{IsPrintedAsString, Real})
 		no_indent && (io.state = ~io.state)
 		foreach(e -> show_element(io, s, e), x)
 		no_indent && (io.state = ~io.state)

@@ -1,7 +1,7 @@
 name = "JSON5"
 uuid = "275fdaeb-5887-4102-8704-6b08b28f797b"
 authors = ["Heptazhou <zhou at 0h7z dot com>"]
-version = "0.21.2"
+version = "0.21.3"
 
 [deps]
 Dates = "ade2ca70-3891-5945-98fb-dc099432e06a"
