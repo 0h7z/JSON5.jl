@@ -108,7 +108,7 @@ mutable struct PrettyContext{T <: IO} <: RecursiveCheckContext
 	objectids::Set{UInt64}
 	recursive_cycle_token::Any
 end
-PrettyContext(io::IO, step, recursive_cycle_token = nothing) = begin
+PrettyContext(io::IO, step::Integer, recursive_cycle_token = nothing) = begin
 	space = !(step < 0)
 	space || (step = ~step)
 	PrettyContext(io, step, 0, false, space, Set{UInt64}(), recursive_cycle_token)
@@ -393,7 +393,7 @@ printed on one line. If pretty-printing is enabled, then a trailing newline will
 be printed; otherwise there will be no trailing newline.
 """
 function show_json(io::IO, s::Serialization, obj; indent::Maybe{Int} = nothing)
-	ctx = isnothing(indent) ? CompactContext(io) : PrettyContext(io, indent)
+	ctx = isnothing(indent) ? CompactContext(io) : PrettyContext(io, indent::Int)
 	show_json(ctx, s, obj)
 	if !isnothing(indent)
 		println(io)

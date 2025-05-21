@@ -5,6 +5,7 @@ using Distributed: RemoteChannel
 using OffsetArrays
 
 using DataStructures: DataStructures
+using Exts: ODict
 
 include("json-samples.jl")
 

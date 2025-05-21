@@ -4,6 +4,8 @@ using Mmap
 using ..Common
 using Parsers: Parsers
 
+using Exts: ODict
+
 """
 Like `isspace`, but work on bytes and includes only the four whitespace
 characters defined by the JSON standard: space, tab, line feed, and carriage
@@ -415,9 +417,9 @@ function unparameterize_type(T::Type)
 end
 
 # Workaround for slow dynamic dispatch for creating objects
-const DEFAULT_PARSERCONTEXT = ParserContext{Dict{String, Any}, Int64, false, nothing}()
+const DEFAULT_PARSERCONTEXT = ParserContext{ODict{String, Any}, Int64, false, nothing}()
 function _get_parsercontext(dicttype, inttype, allownan, null)
-	if dicttype == Dict{String, Any} && inttype == Int64 && !allownan
+	if dicttype == ODict{String, Any} && inttype == Int64 && !allownan
 		DEFAULT_PARSERCONTEXT
 	else
 		ParserContext{unparameterize_type(dicttype), inttype, allownan, null}.instance
@@ -426,7 +428,7 @@ end
 
 """
 	parse(str::AbstractString;
-		  dicttype::Type{T}=Dict,
+		  dicttype::Type{T}=ODict,
 		  inttype::Type{<:Real}=Int64,
 		  allownan::Bool=true,
 		  null=nothing) where {T<:AbstractDict}
@@ -434,13 +436,13 @@ end
 Parses the given JSON string into corresponding Julia types.
 
 Keyword arguments:
-* dicttype: Associative type to use when parsing JSON objects (default: Dict{String, Any})
+* dicttype: Associative type to use when parsing JSON objects (default: ODict{String, Any})
 * inttype: Real number type to use when parsing JSON numbers that can be parsed as integers (default: Int64)
 * allownan: allow parsing of NaN, Infinity, and -Infinity (default: true)
 * null: value to use for parsed JSON `null` values (default: `nothing`)
 """
 function parse(str::AbstractString;
-	dicttype = Dict{String, Any},
+	dicttype = ODict{String, Any},
 	inttype::Type{<:Real} = Int64,
 	allownan::Bool = true,
 	null = nothing)
@@ -456,7 +458,7 @@ end
 
 """
 	parse(io::IO;
-		  dicttype::Type{T}=Dict,
+		  dicttype::Type{T}=ODict,
 		  inttype::Type{<:Real}=Int64,
 		  allownan=true,
 		  null=nothing) where {T<:AbstractDict}
@@ -464,13 +466,13 @@ end
 Parses JSON from the given IO stream into corresponding Julia types.
 
 Keyword arguments:
-* dicttype: Associative type to use when parsing JSON objects (default: Dict{String, Any})
+* dicttype: Associative type to use when parsing JSON objects (default: ODict{String, Any})
 * inttype: Real number type to use when parsing JSON numbers that can be parsed as integers (default: Int64)
 * allownan: allow parsing of NaN, Infinity, and -Infinity (default: true)
 * null: value to use for parsed JSON `null` values (default: `nothing`)
 """
 function parse(io::IO;
-	dicttype = Dict{String, Any},
+	dicttype = ODict{String, Any},
 	inttype::Type{<:Real} = Int64,
 	allownan::Bool = true,
 	null = nothing)
@@ -481,7 +483,7 @@ end
 
 """
 	parsefile(filename::AbstractString;
-			  dicttype=Dict{String, Any},
+			  dicttype=ODict{String, Any},
 			  inttype::Type{<:Real}=Int64,
 			  allownan::Bool=true,
 			  null=nothing,
@@ -490,14 +492,14 @@ end
 Convenience function to parse JSON from the given file into corresponding Julia types.
 
 Keyword arguments:
-* dicttype: Associative type to use when parsing JSON objects (default: Dict{String, Any})
+* dicttype: Associative type to use when parsing JSON objects (default: ODict{String, Any})
 * inttype: Real number type to use when parsing JSON numbers that can be parsed as integers (default: Int64)
 * allownan: allow parsing of NaN, Infinity, and -Infinity (default: true)
 * null: value to use for parsed JSON `null` values (default: `nothing`)
 * use_mmap: use mmap when opening the file (default: true)
 """
 function parsefile(filename::AbstractString;
-	dicttype = Dict{String, Any},
+	dicttype = ODict{String, Any},
 	inttype::Type{<:Real} = Int64,
 	null = nothing,
 	allownan::Bool = true,

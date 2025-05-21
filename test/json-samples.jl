@@ -193,9 +193,9 @@ const svg_tviewer_menu = """
 function validate_svg_tviewer_menu(str)
     j = JSON.parse(str)
     @test j != nothing
-    @test typeof(j) == Dict{String, Any}
+    @test typeof(j) == ODict{String, Any}
     @test length(j) == 1
-    @test typeof(j["menu"]) == Dict{String, Any}
+    @test typeof(j["menu"]) == ODict{String, Any}
     @test length(j["menu"]) == 2
     @test j["menu"]["header"] == "SVG\tViewerα"
     @test isa(j["menu"]["items"], Vector{Any})
